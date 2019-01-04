@@ -1,0 +1,47 @@
+
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
+    }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+dependencyManagement {
+    imports {
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.228'
+    }
+}
+
+dependencies {
+    compile 'com.amazonaws:aws-java-sdk-dynamodb'
+    compile 'org.springframework.boot:spring-boot-starter-web:2.1.1.RELEASE'
+    compile 'org.springframework.cloud:spring-cloud-aws-core:1.1.0.RELEASE'
+    compile 'org.springframework.cloud:spring-cloud-aws-context:1.1.0.RELEASE'
+    compile 'org.springframework.cloud:spring-cloud-aws-messaging:1.1.0.RELEASE'
+    compile 'org.springframework.cloud:spring-cloud-aws-autoconfigure:1.1.0.RELEASE'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:2.1.1.RELEASE'
+}
+
+
+group = 'com.sornemus'
+version = '0.1.0'
+description = 'gethatch-test'
+sourceCompatibility = '1.8'
+
+
+apply plugin: 'application'
+
+mainClassName = 'com.sornemus.gethatchtest.GethatchTestApplication'

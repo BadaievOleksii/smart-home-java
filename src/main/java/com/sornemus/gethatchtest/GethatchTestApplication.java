@@ -1,28 +1,52 @@
 package com.sornemus.gethatchtest;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.model.*;
 
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
-import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
-import software.amazon.awssdk.services.s3.model.ListBucketsRequest;
-import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+import com.amazonaws.AmazonServiceException;
 
-@SpringBootApplication
 public class GethatchTestApplication {
+    public static void main(String[] args)
+    {
+        final String USAGE = "\n" +
+            "Usage:\n" +
+            "    CreateTable <table>\n\n" +
+            "Where:\n" +
+            "    table - the table to create.\n\n" +
+            "Example:\n" +
+            "    CreateTable GreetingsTable\n";
 
-	public static void main(String[] args) {
-		SpringApplication.run(GethatchTestApplication.class, args);
-        Region region = Region.US_WEST_2;
-        S3Client s3 = S3Client.builder().region(region).build();
-// List buckets
-        ListBucketsRequest listBucketsRequest = ListBucketsRequest.builder().build();
-        ListBucketsResponse listBucketsResponse = s3.listBuckets(listBucketsRequest);
-        listBucketsResponse.buckets().stream().forEach(x -> System.out.println(x.name()));
-	}
+        if (args.length < 1) {
+            System.out.println(USAGE);
+            System.exit(1);
+        }
+
+        /* Read the name from command args */
+        String table_name = args[0];
+
+
+        CreateTableRequest request = new CreateTableRequest()
+            .withAttributeDefinitions(
+                new AttributeDefinition("Language", ScalarAttributeType.S),
+                new AttributeDefinition("Greeting", ScalarAttributeType.S))
+            .withKeySchema(
+                new KeySchemaElement("Language", KeyType.HASH),
+                new KeySchemaElement("Greeting", KeyType.RANGE))
+            .withProvisionedThroughput(
+                new ProvisionedThroughput(new Long(10), new Long(10)))
+            .withTableName(table_name);
+
+        final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.defaultClient();
+
+        try {
+            CreateTableResult result = ddb.createTable(request);
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+            System.exit(1);
+        }
+        System.out.println("Done!");
+    }
 
 }
 
