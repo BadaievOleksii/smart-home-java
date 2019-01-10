@@ -1,18 +1,18 @@
 version: "3.3"
 
 services:
-    gradle:
+    application:
         image: "gradle:5.1-jdk8"
+        ports:
+            - "8080:8080"
         volumes:
             - ./:/data/application
         working_dir: "/data/application"
-        entrypoint: "gradle"
+        entrypoint: "./gradlew"
     mqtt:
         image: "eclipse-mosquitto:1.5"
         ports:
             - "1883:1883"
             - "9001:9001"
         volumes:
-            - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
-            - /mosquitto/data
-            - /mosquitto/log
+            - ./.mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
