@@ -44,4 +44,4 @@ out
 .gradle
 classes
 .gradletasknamecache
-*.log
+!/gradle/wrapper/gradle-wrapper.jar
