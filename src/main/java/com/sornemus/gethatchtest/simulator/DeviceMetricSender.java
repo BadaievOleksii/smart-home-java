@@ -1,15 +1,12 @@
 package com.sornemus.gethatchtest.simulator;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
-import org.springframework.integration.endpoint.MethodInvokingMessageSource;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
-import org.springframework.integration.stream.CharacterStreamReadingMessageSource;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +18,15 @@ public class DeviceMetricSender
     @Autowired
     public MqttPahoClientFactory mqttClientFactory;
 
-
+    //todo multiple methods - to imitate several different devices
+    //todo send JSON as message text - wrap all info in it
     @Bean
     public IntegrationFlow mqttOutFlow()
     {
 
         return IntegrationFlows.from(
-                new DeviceMetricSource(),
-                "getMessageText",
+                new TemperatureMetricSource(),
+                "getMetric",
                 e -> e.poller(Pollers.fixedDelay(1000))
             )
             .handle(
@@ -37,11 +35,12 @@ public class DeviceMetricSender
             .get();
     }
 
+    //todo default topic should be device name, received from environment variable (?)
     @Bean
     public MessageHandler mqttOutbound()
     {
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(
-            "iotDevicePublisher",
+            "iotDeviceSimulator",
             this.mqttClientFactory
         );
 

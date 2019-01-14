@@ -18,14 +18,11 @@ import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.integration.stream.CharacterStreamReadingMessageSource;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-public class GethatchTestApplication {
+public class Application {
 
 
-    private static final Log LOGGER = LogFactory.getLog(GethatchTestApplication.class);
 
     public static void main(final String... args)
     {
@@ -68,7 +65,7 @@ public class GethatchTestApplication {
 //        System.out.println("Done!");
 
 
-        SpringApplication.run(GethatchTestApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 
@@ -122,16 +119,23 @@ public class GethatchTestApplication {
 
     @Bean
     public IntegrationFlow mqttInFlow() {
-        return IntegrationFlows.from(mqttInbound())
-            .transform(p -> p + ", received from MQTT")
-            .handle(logger())
+        return IntegrationFlows
+            .from(
+                mqttInbound()
+            )
+            .handle(
+                logger()
+            )
             .get();
     }
 
     @Bean
     public MessageProducerSupport mqttInbound() {
-        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter("iotDeviceConsumer",
-            mqttClientFactory(), "devicename");
+        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
+            "iotDeviceConsumer",
+            mqttClientFactory(),
+            "devicename"//todo subscribe on "/device/*" (? - check wildcard format)
+        );
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);

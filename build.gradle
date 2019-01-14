@@ -62,14 +62,14 @@ compileJava {
 
 apply plugin: 'application'
 
-mainClassName = 'com.sornemus.gethatchtest.GethatchTestApplication'
+mainClassName = 'com.sornemus.gethatchtest.Application'
 
 
 
 apply plugin: 'org.springframework.boot'
 
 bootRun {
-    main = 'com.sornemus.gethatchtest.GethatchTestApplication'
+    main = 'com.sornemus.gethatchtest.Application'
 }
 
 
